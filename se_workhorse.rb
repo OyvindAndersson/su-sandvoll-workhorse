@@ -17,6 +17,21 @@ module SandvollEntreprenor
 			Sketchup.register_extension(ext, true)
 		else
 			UI.messagebox("Sketchup 2016 or greater is required to use SE")
+			
+		end
+
+		# Reload extension by running this method from the Ruby Console:
+		#   SandvollEntreprenor::WorkHorse.reload
+		def self.reload
+			original_verbose = $VERBOSE
+			$VERBOSE = nil
+			pattern = File.join(__dir__, '**/*.rb')
+			Dir.glob(pattern).each { |file|
+				# Cannot use `Sketchup.load` because its an alias for `Sketchup.require`.
+				load file
+			}.size
+		ensure
+			$VERBOSE = original_verbose
 		end
 	end
 end
