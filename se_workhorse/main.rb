@@ -29,7 +29,7 @@ module SandvollEntreprenor
 			end
 
 			# Make prompt for template choice
-			template_dir_path = "#{File.expand_path('~')}/AppData/Roaming/SketchUp/SketchUp 2018/LayOut/Templates"
+			template_dir_path = "#{ENV["HOME"]}/AppData/Roaming/SketchUp/SketchUp 2018/LayOut/Templates"
 			template_files = Dir[template_dir_path + "/*.layout"]
 			template_dir_base_path = ""
 
@@ -69,7 +69,7 @@ module SandvollEntreprenor
 
 			# Create the layout file
 			begin
-				self.create_layout_doc(model_path, layout_path, layout_template_file_path)
+				self.create_layout_doc(model_path, layout_path, layout_template_file_path, model.description, model.name)
 			end
 
 			# Try to send the newly created file to LayOut directly, in newer versions.
@@ -81,7 +81,7 @@ module SandvollEntreprenor
 
 		end
 
-		def self.create_layout_doc(skp_file_path, layout_file_path, layout_template_file_path)
+		def self.create_layout_doc(skp_file_path, layout_file_path, layout_template_file_path, description, project_number)
 			puts "Create layout doc - func: params (1,2,3)"
 			puts "SKP file path: #{skp_file_path}"
 			puts "LAYOUT file path: #{layout_file_path}"
@@ -94,7 +94,8 @@ module SandvollEntreprenor
 
 			# Create skp model from file path (Using A3) [297 / 25.4, 420 / 25.4]
 			bounds_first = Geom::Bounds2d.new(0.5, 0.5, page_width - 1.0, page_height - 2.0)
-			bounds = Geom::Bounds2d.new(0.5, 0.5, page_width - 2, page_height - 1)
+			bounds = bounds_first
+			#bounds = Geom::Bounds2d.new(0.5, 0.5, page_width - 2, page_height - 1)
 
 			# Load instance of the target SKP file
 			begin
@@ -148,9 +149,13 @@ module SandvollEntreprenor
 						  }
 
 						anchor = Geom::Point2d.new(1, 1)
-						text = Layout::FormattedText.new("Testing testing testing testing", anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
+						text = Layout::FormattedText.new(description, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
+
+						anchor = Geom::Point2d.new(1, 2)
+						pnr = Layout::FormattedText.new(project_number, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
 
 						lo_file.add_entity(text, text_layer, page)
+						lo_file.add_entity(pnr, text_layer, page)
 
 					rescue ArgumentError
 						UI.messagebox("Error: Adding SketchUp Model to the LayOut Document!")
@@ -249,7 +254,6 @@ module SandvollEntreprenor
 			model.commit_operation
 		end
 
-
 		def self.create_toolbar
 			toolbar = UI::Toolbar.new PLUGIN_NAME
 
@@ -278,6 +282,7 @@ module SandvollEntreprenor
 				self.test
 			}
 		end
+		
 		# Here we add a menu item for the extension. Note that we again use a
 		# load guard to prevent multiple menu items from accidentally being
 		# created.
