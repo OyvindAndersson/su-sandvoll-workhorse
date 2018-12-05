@@ -15,7 +15,7 @@ module SandvollEntreprenor
 	module WorkHorse
 
 		def self.layout
-			puts "Cunt"
+			puts "Starting Scenes-To-Layout operation..."
 
 			model = Sketchup.active_model
 			if model.nil?
@@ -51,10 +51,11 @@ module SandvollEntreprenor
 				rescue ArgumentError => err
 					UI.messagebox("Error: " + err)
 				end
+			else
+				UI.messagebox("Oops! Finner ingen LayOut maler i 'template' mappen. Lag en mal i layout og lagre den som template.")
+				puts 'Aborting operation...'
+				return
 			end
-
-			puts template_dir_base_path.to_s + templateInput[0].to_s + ".layout"
-			#return
 
 			# Create the output path for the layout file, we will name it the same as
     		# the .skp, but append the output paper size.
@@ -66,12 +67,12 @@ module SandvollEntreprenor
 			layout_path = File.join(dir_path, file_name) # Path to where the new layout file will be saved
 			layout_template_file_path = "#{template_dir_base_path}/#{templateInput[0]}.layout" # Path to the template to use/open
 
+			# Create the layout file
 			begin
 				self.create_layout_doc(model_path, layout_path, layout_template_file_path)
-			
 			end
 
-			# Try to send to LayOut directly in newer versions.
+			# Try to send the newly created file to LayOut directly, in newer versions.
 			if Sketchup.respond_to?(:send_to_layout) and File.exist?(layout_path)
 				sent_to_layout = Sketchup.send_to_layout(layout_path)
 			else
@@ -81,20 +82,21 @@ module SandvollEntreprenor
 		end
 
 		def self.create_layout_doc(skp_file_path, layout_file_path, layout_template_file_path)
-			puts "CREATE LAYOUT DOC MOTHERFUCKER"
-			puts layout_template_file_path
+			puts "Create layout doc - func: params (1,2,3)"
+			puts "SKP file path: #{skp_file_path}"
+			puts "LAYOUT file path: #{layout_file_path}"
+			puts "LAYOUT TEMPLATE file path: #{layout_template_file_path}"
 
 			# Open selected layout template file
 			lo_file = Layout::Document.open(layout_template_file_path)
 			page_width = lo_file.page_info.width
 			page_height = lo_file.page_info.height
 
-			puts page_width.to_s
-
 			# Create skp model from file path (Using A3) [297 / 25.4, 420 / 25.4]
 			bounds_first = Geom::Bounds2d.new(0.5, 0.5, page_width - 1.0, page_height - 2.0)
 			bounds = Geom::Bounds2d.new(0.5, 0.5, page_width - 2, page_height - 1)
 
+			# Load instance of the target SKP file
 			begin
 				skp_model = Layout::SketchUpModel.new(skp_file_path, bounds_first)
 			rescue ArgumentError
@@ -111,10 +113,10 @@ module SandvollEntreprenor
 			lo_file.layers.reorder(skp_layer, 0)
 			lo_file.layers.reorder(text_layer, 1)
 
-			#lo_file.page_info.height = height
-			#lo_file.page_info.width = width
+			# Set layout page properties
 			lo_file.page_info.display_resolution = Layout::PageInfo::RESOLUTION_HIGH
 
+			# Get the number of scenes in the loaded SKP file
 			num_scenes = skp_model.scenes.length
 
 			if(num_scenes == 1)
@@ -123,16 +125,33 @@ module SandvollEntreprenor
 			else
 				# skip the default scene
 				page = lo_file.pages[0]
+
+				# Loop N scenes and distribute the scenes onto individual pages.
 				1.upto(num_scenes - 1) { |index|
+
+					# skp_model is already set with an instance, retrieved before looping here.
+					# therefore we don't need to recreate it on the first loop.
 					if(index > 1)
 						page = lo_file.pages.add
-						# make a new skp model
+						# make a new skp model instance (for each page)
 						skp_model = Layout::SketchUpModel.new(skp_file_path, bounds)
 						skp_model.current_scene = index
 					end
 
+					# Add the skp model to the skp layer, on the current page in the loop
 					begin
 						lo_file.add_entity(skp_model, skp_layer, page)
+
+						skp_ents = skp_model.entities.entities
+						skp_ents.each { |entity|
+							puts entity
+						  }
+
+						anchor = Geom::Point2d.new(1, 1)
+						text = Layout::FormattedText.new("Testing testing testing testing", anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
+
+						lo_file.add_entity(text, text_layer, page)
+
 					rescue ArgumentError
 						UI.messagebox("Error: Adding SketchUp Model to the LayOut Document!")
 					end
