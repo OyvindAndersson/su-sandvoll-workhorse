@@ -4,7 +4,7 @@ require 'langhandler.rb'
 
 module SandvollEntreprenor
 	module WorkHorse
-		VERSION = "0.0.1"
+		VERSION = "0.0.1.r2"
 		PLUGIN = self
 		PLUGIN_NAME = "Sandvoll Entreprenor".freeze
 
@@ -17,7 +17,6 @@ module SandvollEntreprenor
 			Sketchup.register_extension(ext, true)
 		else
 			UI.messagebox("Sketchup 2016 or greater is required to use SE")
-			
 		end
 
 		# Reload extension by running this method from the Ruby Console:
