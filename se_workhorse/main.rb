@@ -143,22 +143,19 @@ module SandvollEntreprenor
 					begin
 						lo_file.add_entity(skp_model, skp_layer, page)
 
-						skp_ents = skp_model.entities.entities
-						skp_ents.each { |entity|
-							puts entity
-						  }
+						unless (description.nil? or description.length == 0) or (project_number.nil? or project_number.length == 0)
+							anchor = Geom::Point2d.new(1, 1)
+							text = Layout::FormattedText.new(description, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
 
-						anchor = Geom::Point2d.new(1, 1)
-						text = Layout::FormattedText.new(description, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
+							anchor = Geom::Point2d.new(1, 2)
+							pnr = Layout::FormattedText.new(project_number, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
 
-						anchor = Geom::Point2d.new(1, 2)
-						pnr = Layout::FormattedText.new(project_number, anchor, Layout::FormattedText::ANCHOR_TYPE_TOP_LEFT)
+							lo_file.add_entity(text, text_layer, page)
+							lo_file.add_entity(pnr, text_layer, page)
+						end
 
-						lo_file.add_entity(text, text_layer, page)
-						lo_file.add_entity(pnr, text_layer, page)
-
-					rescue ArgumentError
-						UI.messagebox("Error: Adding SketchUp Model to the LayOut Document!")
+					rescue ArgumentError => err
+						UI.messagebox("Error: Adding SketchUp Model to the LayOut Document! : #{err}")
 					end
 
 					page.name = skp_model.scenes[index]
@@ -282,7 +279,7 @@ module SandvollEntreprenor
 				self.test
 			}
 		end
-		
+
 		# Here we add a menu item for the extension. Note that we again use a
 		# load guard to prevent multiple menu items from accidentally being
 		# created.
