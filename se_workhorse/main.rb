@@ -283,7 +283,9 @@ module SandvollEntreprenor
 		end
 
 		def self.create_menus
-			
+
+			Production::create_menus
+
 			menu = UI.menu('Extensions')
 			submenu = menu.add_submenu(PLUGIN_NAME)
 
