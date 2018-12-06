@@ -1,7 +1,8 @@
 # Copyright 2016 Trimble Inc
 # Licensed under the MIT license
-
+require "pathname"
 require 'sketchup.rb'
+require_relative './production'
 
 #
 # All selected components and groups split into individual Scenes
@@ -14,6 +15,8 @@ require 'sketchup.rb'
 module SandvollEntreprenor
 	module WorkHorse
 
+
+
 		def self.layout
 			puts "Starting Scenes-To-Layout operation..."
 
@@ -23,22 +26,23 @@ module SandvollEntreprenor
 				return
 			end
 
-			model_path = model.path
-			if model_path.empty?
+			model_path = Pathname(model.path)
+			unless model_path.exist?
 				UI.messagebox("Modellen må være lagret først!")
 			end
 
 			# Make prompt for template choice
-			template_dir_path = "#{ENV["HOME"]}/AppData/Roaming/SketchUp/SketchUp 2018/LayOut/Templates"
-			template_files = Dir[template_dir_path + "/*.layout"]
+			template_dir_path = Pathname("#{ENV["HOME"]}/AppData/Roaming/SketchUp/SketchUp 2018/LayOut/Templates")
+			puts template_dir_path
+			template_files = Dir[template_dir_path.to_s + "/*.layout"]
 			template_dir_base_path = ""
 
 			if template_files.length > 0
 				# Get only dir path to the templates. We don't want to show that in the selectbox
-				template_dir_base_path = File.dirname template_files[0]
+				template_dir_base_path = Pathname(File.dirname template_files[0])
 
 				# Extract all file names
-				template_files_nameonly = template_files.map { |item| File.basename(item, ".layout")}
+				template_files_nameonly = template_files.reject{|file| file.include? "Backup"}.collect{|file| File.basename(file.to_s, ".layout")}
 
 				# Get the first item in the array
 				default_selection = template_files_nameonly[0]
@@ -64,9 +68,15 @@ module SandvollEntreprenor
 
 			# Name on the layout file (based on the SKP file)
 			file_name = file_name + ".layout"
-			layout_path = File.join(dir_path, file_name) # Path to where the new layout file will be saved
+			#layout_path = File.join(model_path.dirname, file_name) # Path to where the new layout file will be saved
+			layout_path = model_path.dirname + file_name
 			layout_template_file_path = "#{template_dir_base_path}/#{templateInput[0]}.layout" # Path to the template to use/open
 
+			puts "File name: #{file_name}"
+			puts "Layout path: #{layout_path}"
+			puts "Tpl file: #{layout_template_file_path}"
+
+			return
 			# Create the layout file
 			begin
 				self.create_layout_doc(model_path, layout_path, layout_template_file_path, model.description, model.name)
@@ -88,7 +98,12 @@ module SandvollEntreprenor
 			puts "LAYOUT TEMPLATE file path: #{layout_template_file_path}"
 
 			# Open selected layout template file
-			lo_file = Layout::Document.open(layout_template_file_path)
+			begin
+				lo_file = Layout::Document.open(layout_template_file_path) # FAIL
+			rescue ArgumentError => err
+				UI.messagebox("Error: Opening Layout template file from: '#{layout_template_file_path}' - '#{err}'")
+				puts "Error: Opening Layout template file from: '#{layout_template_file_path}' - '#{err}'"
+			end
 			page_width = lo_file.page_info.width
 			page_height = lo_file.page_info.height
 
@@ -268,6 +283,7 @@ module SandvollEntreprenor
 		end
 
 		def self.create_menus
+			
 			menu = UI.menu('Extensions')
 			submenu = menu.add_submenu(PLUGIN_NAME)
 
