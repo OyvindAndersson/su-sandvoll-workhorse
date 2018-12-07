@@ -15,7 +15,8 @@ require_relative './production'
 module SandvollEntreprenor
 	module WorkHorse
 
-
+		ASSETS_DIR = "assets".freeze
+		IMAGES_DIR = "#{ASSETS_DIR}/images".freeze
 
 		def self.layout
 			puts "Starting Scenes-To-Layout operation..."
@@ -280,22 +281,26 @@ module SandvollEntreprenor
 
 			toolbar = toolbar.add_item create_cube_cmd
 			toolbar.show
+
+			# Call method to create toolbars for other modules
+			Production::create_toolbar(toolbar)
 		end
 
 		def self.create_menus
-
-			Production::create_menus
-
+			# Get menuitem "Extensions"
 			menu = UI.menu('Extensions')
+
+			# The extension main submenu
 			submenu = menu.add_submenu(PLUGIN_NAME)
 
-			submenu.add_item("Lag boks (Debug)")  {
-				self.create_cube
-			}
+			# Create all menus for the production module
+			Production::create_menus(submenu)
 
-			submenu.add_item("Generer") {
-				self.test
-			}
+			# Debug / Testing menus
+			submenu.add_separator
+			debug_menu = submenu.add_submenu("Debug")
+			debug_menu.add_item("Lag geometri test")  { self.create_cube }
+			debug_menu.add_item("Push/Pull test") { self.test }
 		end
 
 		# Here we add a menu item for the extension. Note that we again use a
