@@ -4,10 +4,13 @@ const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
-	entry: './js/index.js', 
+	entry: {
+		//shared: './js/index.js',
+		layout: './js/modules/layout/index.js'
+	}, 
 	output: {
-		path: path.resolve(__dirname, 'js'),
-		filename: 'shared.bundle.js'
+		path: path.resolve(__dirname, './build'),
+		filename: '[name].bundle.js'
 	},
 	module: {
 		rules: [

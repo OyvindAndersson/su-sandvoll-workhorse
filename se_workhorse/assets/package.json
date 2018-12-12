@@ -4,8 +4,8 @@
   "description": "",
   "main": "js/index.js",
   "scripts": {
-    "dev": "webpack-dev-server --mode development",
-    "prod": "webpack --mode development"
+    "dev": "webpack --mode development",
+    "prod": "webpack --mode production"
   },
   "keywords": [
     "sketchup"

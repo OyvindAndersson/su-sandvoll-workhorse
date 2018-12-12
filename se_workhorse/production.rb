@@ -10,13 +10,13 @@ module SandvollEntreprenor
     module Production
 
         MENU_LABEL = "Produksjon"
-        MODULE_ASSETS = "#{File.join(File.dirname(__FILE__), "assets", "module_production")}".freeze
+        MODULE_ASSETS = "#{File.join(File.dirname(__FILE__), "assets", "modules", "layout")}".freeze
         
         #
         # Spawn the HTML dialog interface
         #
-        def self.spawn_splitscene_dialog
-            puts "SandvollEntreprenor::Production.spawn_splitscene_dialog"
+        def self.show_dialog
+            puts "SandvollEntreprenor::Production.show_dialog"
 
             # Get path to index file of the dialog
             file_path = Pathname("#{MODULE_ASSETS}/index.html")
@@ -39,7 +39,7 @@ module SandvollEntreprenor
             dialog.set_file(file_path.to_s)
 
             # Add callbacks
-            self.setup_dialog_js_callbacks(dialog)
+            self.setup_js_callbacks(dialog)
 
             # Center and show dialog
             #dialog.center
@@ -49,12 +49,13 @@ module SandvollEntreprenor
         #
         # Setup JS callbacks for the HTML Dialog interface
         #
-        def self.setup_dialog_js_callbacks(dialog)
+        def self.setup_js_callbacks(dialog)
+
             # When document loads
             dialog.add_action_callback("onload") do |context|
                 # Send the layout template file-names to the interface
                 json = get_layout_templates
-                dialog.execute_script("set_template_options('#{json}')")
+                dialog.execute_script("window.skp_action('MOD_LAYOUT_TEMPLATE_NAMES','#{json}')")
 
                 # ... do other onload stuff for the interface
             end
@@ -104,7 +105,7 @@ module SandvollEntreprenor
         #
         def self.create_toolbar(extension_main_toolbar)
             splitscene_cmd = UI::Command.new("Split-scene til Layout") {
-				self.spawn_splitscene_dialog
+				self.show_dialog
 			}
 			splitscene_cmd.small_icon = "assets/images/scenes_to_layout-01.png"
 			splitscene_cmd.large_icon = "assets/images/scenes_to_layout-01.png"

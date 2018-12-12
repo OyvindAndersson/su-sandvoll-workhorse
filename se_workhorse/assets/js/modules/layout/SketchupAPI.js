@@ -1,3 +1,37 @@
+/**
+ * Sketchup API for module "layout".
+ * 
+ * Action callbacks setup for this module
+ * 
+ * Action names possible to handle in skp_action
+ * - MOD_LAYOUT_TEMPLATE_NAMES
+ */
+
+
+export function skp_init() {
+    if(!sketchup){
+        throw new Error("Sketchup instance not found!")
+    }
+
+    sketchup.onload();
+}
+
+/**
+ * Receives json formatted data object
+ * @param action Action identifier
+ * @param data JSON data object
+ */
+export function skp_action(action, data) {
+    var obj = {...JSON.parse(data)}
+    console.log(`Received data for action: ${action}`)
+    console.log(obj)
+    
+    switch(action){
+
+    }
+}
+
+
 /** Init on body load */
 function init() {
     sketchup.onload();
