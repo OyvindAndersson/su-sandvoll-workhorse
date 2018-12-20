@@ -6,9 +6,13 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
 	entry: {
 		//shared: './js/index.js',
-		layout: './js/modules/layout/index.js'
+		layout: './js/modules/layout/index.js',
+		layers: './js/modules/layers/index.js'
 	}, 
 	output: {
+		library: 'SKPClientLib',
+		libraryExport: 'default',
+		libraryTarget: 'var',
 		path: path.resolve(__dirname, './build'),
 		filename: '[name].bundle.js'
 	},
@@ -28,6 +32,14 @@ module.exports = {
 				use: [
 					'vue-style-loader',
 					'css-loader'
+				]
+			},
+			{
+				test: /\.scss$/,
+				use: [
+					'vue-style-loader',
+					'css-loader',
+					'sass-loader'
 				]
 			}
 		]

@@ -2,7 +2,8 @@
 # Licensed under the MIT license
 require "pathname"
 require 'sketchup.rb'
-require_relative './production'
+require_relative './modules/layout/layout'
+require_relative './modules/layers/layers'
 
 #
 # All selected components and groups split into individual Scenes
@@ -283,7 +284,8 @@ module SandvollEntreprenor
 			toolbar.show
 
 			# Call method to create toolbars for other modules
-			Production::create_toolbar(toolbar)
+			Layout::create_toolbar(toolbar)
+			Layers::create_toolbar(toolbar)
 		end
 
 		def self.create_menus
@@ -293,8 +295,9 @@ module SandvollEntreprenor
 			# The extension main submenu
 			submenu = menu.add_submenu(PLUGIN_NAME)
 
-			# Create all menus for the production module
-			Production::create_menus(submenu)
+			# Create all menus for the Layout module
+			Layout::create_menus(submenu)
+			Layers::create_menus(submenu)
 
 			# Debug / Testing menus
 			submenu.add_separator

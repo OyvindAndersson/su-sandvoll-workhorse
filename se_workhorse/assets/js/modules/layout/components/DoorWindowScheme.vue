@@ -21,8 +21,11 @@
                         <!-- Select layout template file -->
                         <div class="form-group">
                             <label for="exampleInputEmail1">Layout mal</label>
-                            <select id="templates_selectbox" class="form-control" name="template_file">
+                            <select id="templates_selectbox" class="form-control" name="template_file" v-model="selected">
                                 <option value="">--</option>
+                                <option v-for="option in options" :value="option.value" :key="option.id">
+                                    {{ option.text }}
+                                </option>
                             </select>
                             <small class="text-muted">Velg malen som skal fordele scenene.</small>
                         </div>
@@ -39,12 +42,21 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
+
     export default {
         data: function() {
             return {
                 title: "Dør og Vinduskjema",
-                subtitle: "Generer vinduskjema i en valgt Layout-mal."
+                subtitle: "Generer vinduskjema i en valgt Layout-mal.",
+                selected: ''
             }
+        },
+        computed: mapState({
+            options: state => state.layout.options
+        }),
+        mounted: function(){
+            sketchup.load_module_info('production')
         }
     }
 </script>

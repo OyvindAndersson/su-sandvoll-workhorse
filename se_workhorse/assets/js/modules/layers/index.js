@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Production from './components/Production.vue'
-import DoorWindowScheme from './components/DoorWindowScheme.vue'
-import Quote from './components/Quote.vue'
+import { ModelSelect } from 'vue-search-select'
+import Layers from './components/Layers.vue'
+
 
 import {store} from './store'
 
@@ -28,15 +28,14 @@ Vue.config.devtools = true
 /**
  * Globally Register modules
  */
+Vue.component('model-select', ModelSelect)
 //Vue.component('production-page', require('./modules/layout/Production.vue').default)
 
 /**
  * Routes
  */
 const routes = [
-  { path: '/production', component: Production },
-  { path: '/quote', component: Quote },
-  { path: '*', component: DoorWindowScheme }
+  { path: '*', component: Layers }
 ]
 
 /**

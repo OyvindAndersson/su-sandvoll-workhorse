@@ -26,15 +26,22 @@ export function skp_init() {
  * @param data JSON data object
  */
 export function skp_action(action, data) {
-    const obj = JSON.parse(data)
+    let obj = null
+    try{
+        obj = JSON.parse(data)
+    } catch(e){
+        alert("Error")
+        console.log(e)
+    }
+    
     console.log(`Received data for action: ${action}`)
     console.log(obj)
     console.log('--------------------------------------------------------')
 
     switch(action){
-        case `MOD_LAYOUT_TEMPLATE_NAMES`:
+        case `MOD_LAYERS_NAMES`:
             // Turn array of file-names into object literals to display in select element
-            let options = {}
+            let options = new Array()
             for(let i = 0; i < obj.length; i++){
                 options[i] = { text: obj[i], value: i, id: `tpl-file-${i}` }
             }

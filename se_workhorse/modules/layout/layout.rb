@@ -7,10 +7,10 @@ require 'json'
 require 'sketchup.rb'
 
 module SandvollEntreprenor
-    module Production
+    module Layout
 
         MENU_LABEL = "Produksjon"
-        MODULE_ASSETS = "#{File.join(File.dirname(__FILE__), "assets", "modules", "layout")}".freeze
+        MODULE_ASSETS = "#{File.join(File.dirname(__FILE__), "..", "..", "assets", "modules", "layout")}".freeze
         
         #
         # Spawn the HTML dialog interface
@@ -54,10 +54,20 @@ module SandvollEntreprenor
             # When document loads
             dialog.add_action_callback("onload") do |context|
                 # Send the layout template file-names to the interface
-                json = get_layout_templates
-                dialog.execute_script("window.skp_action('MOD_LAYOUT_TEMPLATE_NAMES','#{json}')")
+                #json = get_layout_templates
+
+                #dialog.execute_script("SKPClientLib.skp_action('MOD_LAYOUT_TEMPLATE_NAMES','#{json}')")
 
                 # ... do other onload stuff for the interface
+            end
+
+            dialog.add_action_callback("load_module_info") do |context, module_name|
+
+                puts "loading module info for #{module_name}"
+                # Send the layout template file-names to the interface
+                json = get_layout_templates
+
+                dialog.execute_script("SKPClientLib.skp_action('MOD_LAYOUT_TEMPLATE_NAMES','#{json}')")
             end
 
             # json_args => [{"name"=>"template_file", "value"=>"Forespørsel"}]
