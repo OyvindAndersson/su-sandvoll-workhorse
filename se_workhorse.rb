@@ -24,7 +24,7 @@ module SandvollEntreprenor
 		def self.reload
 			original_verbose = $VERBOSE
 			$VERBOSE = nil
-			pattern = File.join(__dir__, '**/*.rb')
+			pattern = File.join(__dir__, '**/**/*.rb')
 			Dir.glob(pattern).each { |file|
 				# Cannot use `Sketchup.load` because its an alias for `Sketchup.require`.
 				load file

@@ -55,6 +55,7 @@ module SandvollEntreprenor
             dialog.add_action_callback("onload") do |context|
             end
 
+            # After module-sepcific frontend component loads
             dialog.add_action_callback("load_module_info") do |context, module_name|
                 puts "loading module info for #{module_name}"
 
@@ -63,8 +64,7 @@ module SandvollEntreprenor
                 layer_names = layers.map{|layer| layer.name.strip}
                 @layer_names = layer_names.to_json
 
-                #puts layer_names
-
+                # Get all layer-names over to our frontend
                 dialog.execute_script("SKPClientLib.skp_action('MOD_LAYERS_NAMES','#{layer_names}')")
             end
 
@@ -73,12 +73,46 @@ module SandvollEntreprenor
                 args = JSON.parse(values)
                 puts action
                 puts args
+
+                case action
+                when 'MOD_LAYERS_SET_SELECTED_TO_LAYER'
+                    handle_set_selected_to_layer args["text"]
+                else
+                    puts "Action handler not implemented"
+                end
             end
 
         end
 
         #
-        # Create menus' for this module
+        # Handler for action response: MOD_LAYERS_SET_SELECTED_TO_LAYER
+        #
+        def self.handle_set_selected_to_layer(layername)
+            puts layername
+
+            model = Sketchup.active_model
+            layers = model.layers
+
+            if(layers[layername])
+                the_layer = layers[layername]
+
+                # start moving selection to layer
+                model.start_operation('Set selection to layer', true)
+
+                selection = model.selection
+                selection.each { |entity| entity.layer = the_layer }
+
+                # End operation
+                model.commit_operation
+
+            else
+                UI.messagebox("Layer not found")
+                return false
+            end
+        end
+
+        #
+        # Create SKP menus' for this module
         #
         def self.create_menus(submenu)
             # Check if extensions' menu item has been passed in
@@ -92,7 +126,7 @@ module SandvollEntreprenor
         end
 
         #
-        # Create toolbars related to this module
+        # Create SKP toolbars related to this module
         #
         def self.create_toolbar(extension_main_toolbar)
             cmd = UI::Command.new("Layer verktøy") {
