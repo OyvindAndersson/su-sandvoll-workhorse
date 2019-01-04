@@ -24,13 +24,20 @@ module SandvollEntreprenor
 		def self.reload
 			original_verbose = $VERBOSE
 			$VERBOSE = nil
-			pattern = File.join(__dir__, '**/**/*.rb')
-			Dir.glob(pattern).each { |file|
-				# Cannot use `Sketchup.load` because its an alias for `Sketchup.require`.
-				load file
-			}.size
+			pattern = File.join(__dir__, '**/*.rb')
+			
+			Dir[pattern].reject{ |f| f[%r{node_modules}] }.each do |filename|
+				puts filename
+				load filename
+			end
 		ensure
 			$VERBOSE = original_verbose
 		end
 	end
 end
+
+#Dir.glob(pattern).each { |file|
+#	puts file
+	# Cannot use `Sketchup.load` because its an alias for `Sketchup.require`.
+	
+#}.size

@@ -284,7 +284,7 @@ module SandvollEntreprenor
 			toolbar.show
 
 			# Call method to create toolbars for other modules
-			Layout::create_toolbar(toolbar)
+			LayoutTools::create_toolbar(toolbar)
 			Layers::create_toolbar(toolbar)
 		end
 
@@ -296,7 +296,7 @@ module SandvollEntreprenor
 			submenu = menu.add_submenu(PLUGIN_NAME)
 
 			# Create all menus for the Layout module
-			Layout::create_menus(submenu)
+			LayoutTools::create_menus(submenu)
 			Layers::create_menus(submenu)
 
 			# Debug / Testing menus

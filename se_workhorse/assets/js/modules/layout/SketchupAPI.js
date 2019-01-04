@@ -34,7 +34,7 @@ export function skp_action(action, data) {
     switch(action){
         case `MOD_LAYOUT_TEMPLATE_NAMES`:
             // Turn array of file-names into object literals to display in select element
-            let options = {}
+            let options = new Array()
             for(let i = 0; i < obj.length; i++){
                 options[i] = { text: obj[i], value: i, id: `tpl-file-${i}` }
             }
@@ -49,8 +49,9 @@ export function skp_action(action, data) {
 }
 
 
-
-
+export const actionResponse = {
+    MOD_LAYOUT_SEND_TO_LAYOUT: 'MOD_LAYOUT_SEND_TO_LAYOUT'
+}
 
 
 
